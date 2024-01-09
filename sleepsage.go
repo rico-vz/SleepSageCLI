@@ -20,7 +20,7 @@ func main() {
 	logger = log.NewWithOptions(os.Stderr, log.Options{
 		ReportTimestamp: true,
 		TimeFormat:      time.Kitchen,
-		Prefix:          "SleepSage💤 ",
+		Prefix:          "SleepSage💤",
 	})
 
 	huh.NewSelect[bool]().
@@ -43,13 +43,30 @@ func main() {
 		logger.Infof("You should try to waking up at one of the following times to feel refreshed:")
 		for _, wakeUpTime := range wakeUpTimes {
 			if wakeUpTime == wakeUpTimes[0] {
-				logger.SetPrefix("🟠 ")
+				logger.SetPrefix("🟡")
 			} else {
-				logger.SetPrefix("🟢 ")
+				logger.SetPrefix("🟢")
 			}
 			logger.Infof(wakeUpTime)
 		}
+	} else {
+		huh.NewInput().
+			Title("When do you want to wake up?").
+			Placeholder("HH:MM").
+			Validate(validateTime).
+			Value(&strTime).Run()
 
+		sleepTimes := calculateSleepTime(sleepTime)
+
+		logger.Infof("You should try to go to sleep at one of the following times to feel refreshed:")
+		for _, sleepTime := range sleepTimes {
+			if sleepTime == sleepTimes[0] {
+				logger.SetPrefix("🟡")
+			} else {
+				logger.SetPrefix("🟢")
+			}
+			logger.Infof(sleepTime)
+		}
 	}
 }
 
@@ -68,7 +85,6 @@ func validateTime(str string) error {
 func calculateWakeUpTime(sleepTime time.Time) []string {
 	sleepCycleDuration := 90 * time.Minute
 
-	// Add 20 minutes to consider the time to fall asleep
 	sleepTime = sleepTime.Add(20 * time.Minute)
 
 	wakeUpTimes := make([]string, 3)
@@ -79,4 +95,19 @@ func calculateWakeUpTime(sleepTime time.Time) []string {
 	}
 
 	return wakeUpTimes
+}
+
+func calculateSleepTime(wakeUpTime time.Time) []string {
+	sleepCycleDuration := 90 * time.Minute
+
+	wakeUpTime = wakeUpTime.Add(-20 * time.Minute)
+
+	sleepTimes := make([]string, 3)
+
+	for i := 4; i <= 6; i++ {
+		sleepTime := wakeUpTime.Add(-sleepCycleDuration * time.Duration(i))
+		sleepTimes[i-4] = sleepTime.Format("15:04")
+	}
+
+	return sleepTimes
 }
