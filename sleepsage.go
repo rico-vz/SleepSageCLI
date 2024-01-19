@@ -8,8 +8,16 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+type Mode int
+
+const (
+	WakeUp Mode = iota
+	Sleep
+	SleepNow
+)
+
 var (
-	wakeUpMode bool
+	wakeUpMode Mode
 	strTime    string
 	sleepTime  time.Time
 	err        error
@@ -23,15 +31,17 @@ func main() {
 		Prefix:          "SleepSage💤",
 	})
 
-	huh.NewSelect[bool]().
+	huh.NewSelect[Mode]().
 		Title("SleepSage - Mode").
 		Options(
-			huh.NewOption("When should I wake up?", true),
-			huh.NewOption("When should I go to sleep?", false),
+			huh.NewOption("When should I wake up?", WakeUp),
+			huh.NewOption("When should I go to sleep?", Sleep),
+			huh.NewOption("When should I wake up if I go to sleep now?", SleepNow),
 		).
 		Value(&wakeUpMode).Run()
 
-	if wakeUpMode {
+	switch wakeUpMode {
+	case WakeUp:
 		huh.NewInput().
 			Title("When do you want to go to sleep?").
 			Placeholder("HH:MM").
@@ -49,7 +59,7 @@ func main() {
 			}
 			logger.Infof(wakeUpTime)
 		}
-	} else {
+	case Sleep:
 		huh.NewInput().
 			Title("When do you want to wake up?").
 			Placeholder("HH:MM").
@@ -66,6 +76,19 @@ func main() {
 				logger.SetPrefix("🟢")
 			}
 			logger.Infof(sleepTime)
+		}
+	case SleepNow:
+		// Adds 15 minutes to account for getting off the device and getting ready for bed
+		wakeUpTimes := calculateWakeUpTime(time.Now().Add(15 * time.Minute))
+
+		logger.Infof("You should try to waking up at one of the following times to feel refreshed:")
+		for _, wakeUpTime := range wakeUpTimes {
+			if wakeUpTime == wakeUpTimes[0] {
+				logger.SetPrefix("🟡")
+			} else {
+				logger.SetPrefix("🟢")
+			}
+			logger.Infof(wakeUpTime)
 		}
 	}
 }
