@@ -1,6 +1,6 @@
 module sleepsage
 
-go 1.21.5
+go 1.25.0
 
 require (
 	github.com/charmbracelet/huh v0.2.3
@@ -35,9 +35,9 @@ require (
 	github.com/yuin/goldmark v1.6.0 // indirect
 	github.com/yuin/goldmark-emoji v1.0.2 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/term v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 )
